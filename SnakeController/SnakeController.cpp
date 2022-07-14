@@ -212,17 +212,33 @@ Controller::Segment Controller::getNewHead() const
 
     return newHead;
 }
+void Controller::handlePause(const PauseInd& psInd){
+    if(paused) paused = false;
+    else paused = true;
+}
+bool Controller::isPaused(std::unique_ptr<Event>&& e){
+
+    if(!paused or e->getMessageId() == PauseInd::MESSAGE_ID or e->getMessageId() == FoodInd::MESSAGE_ID or e->getMessageId() == FoodResp::MESSAGE_ID)
+    return true;
+    return false;
+}
+
 
 void Controller::receive(std::unique_ptr<Event> e)
 {
+
+    if(isPaused(std::move(e))){
     switch(e->getMessageId())
-    {
+    {   
+        case PauseInd::MESSAGE_ID: return handlePause(*static_cast<EventT<PauseInd> const&>(*e)) ;
         case TimeoutInd::MESSAGE_ID: return handleTimePassed(*static_cast<EventT<TimeoutInd> const&>(*e));
         case DirectionInd::MESSAGE_ID: return handleDirectionChange(*static_cast<EventT<DirectionInd> const&>(*e));
         case FoodInd::MESSAGE_ID: return handleFoodPositionChange(*static_cast<EventT<FoodInd> const&>(*e));
         case FoodResp::MESSAGE_ID: return handleNewFood(*static_cast<EventT<FoodResp> const&>(*e));
+        
         default: throw UnexpectedEventException();
     };
+    }   
 }
 
 } // namespace Snake

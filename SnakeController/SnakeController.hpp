@@ -49,18 +49,19 @@ private:
     bool doesCollideWithSnake(const Segment& newSegment) const;
     bool doesCollideWithWall(const Segment& newSegment) const;
     bool doesCollideWithFood(const Segment& newSegment) const;
+    bool isPaused(std::unique_ptr<Event>&& e);
 
     void notifyAboutFailure();
     void repaintTile(const Segment& position, Cell type);
     void repaintTile(unsigned int x, unsigned int y, Cell type);
 
     void cleanNotExistingSnakeSegments();
-
+    void handlePause(const PauseInd& psInd);
 
     IPort& m_displayPort;
     IPort& m_foodPort;
     IPort& m_scorePort;
-
+    bool paused = false;
     std::pair<int, int> m_mapDimension;
     std::pair<int, int> m_foodPosition;
 
